@@ -1,0 +1,22 @@
+# Part of `travis-lazarus` (https://github.com/nielsAD/travis-lazarus)
+# License: MIT
+
+os:
+  - linux
+  - osx
+
+env:
+  - LAZ_VER=      # Use the latest version from the package manager
+  - LAZ_VER=1.2.6
+  - LAZ_VER=1.4.4
+
+matrix:
+  exclude:
+    - os: osx
+      env: LAZ_VER=
+
+sudo: true
+install: ./.travis.install.py
+
+script:
+  - lazbuild --widgetset=nogui my_lazarus_tests.lpi && ./bin/my_lazarus_tests --all --format=plain
