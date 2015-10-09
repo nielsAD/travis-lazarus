@@ -23,5 +23,5 @@ install:
   - ./.travis.install.py
 
 script:
-  - $LAZ_WINE lazbuild --widgetset=nogui $LAZ_OPT my_lazarus_tests.lpi
+  - $LAZ_WINE lazbuild $LAZ_OPT my_lazarus_tests.lpi
   - $LAZ_WINE ./bin/my_lazarus_tests --all --format=plain
