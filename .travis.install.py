@@ -37,7 +37,16 @@ def install_osx_dmg(dmg):
             os.system('hdiutil detach %s' % (v))
 
 def install_lazarus_default():
-    return os.system('%s update && %s install lazarus lcl-nogui' % (OS_PMAN, OS_PMAN)) == 0
+    if OS_NAME == 'linux':
+        # Make sure nogui is installed for headless runs
+        pkg = 'lazarus lcl-nogui'
+    elif OS_NAME == 'osx':
+        # Install brew cask first
+        pkg = 'caskroom/cask/brew-cask && %s cask install fpc fpcsrc lazarus' % OS_PMAN
+    else:
+        # Default to lazarus
+        pkg = 'lazarus'
+    return os.system('%s update && %s install %s' % (OS_PMAN, OS_PMAN, pkg)) == 0
 
 def install_lazarus_version(ver,rel,wine):
     # Download directory for specified Lazarus version
