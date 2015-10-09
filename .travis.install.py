@@ -6,14 +6,14 @@ import os
 import subprocess
 
 OS_NAME=os.environ.get('TRAVIS_OS_NAME') or 'linux'
-OS_PMAN={'linux': 'sudo apt-get', 'osx': 'homebrew'}[OS_NAME]
+OS_PMAN={'linux': 'sudo apt-get', 'osx': 'brew'}[OS_NAME]
 
 LAZ_TMP_DIR=os.environ.get('LAZ_TMP_DIR') or 'lazarus_tmp'
 LAZ_REL_DEF=os.environ.get('LAZ_REL_DEF') or {'linux':'amd64', 'osx':'i386', 'wine':'32'}
 LAZ_BIN_SRC=os.environ.get('LAZ_BIN_SRC') or 'http://mirrors.iwi.me/lazarus/releases/%(target)s/Lazarus%%20%(version)s'
 LAZ_BIN_TGT=os.environ.get('LAZ_BIN_TGT') or {
     'linux': 'Lazarus%%20Linux%%20%(release)s%%20DEB',
-    'osx':   'Lazarus%%20Mac%%20OS%20X%20%(release)s',
+    'osx':   'Lazarus%%20Mac%%20OS%%20X%%20%(release)s',
     'wine':  'Lazarus%%20Windows%%20%(release)s%%20bits'
 }
 
