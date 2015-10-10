@@ -57,7 +57,7 @@ def install_lazarus_version(ver,rel,wine):
         return False
 
     if wine:
-        if os.system('%s update && %s install wine' % (OS_PMAN, OS_PMAN)) != 0:
+        if os.system('%s update && %s install wine && %s wineboot' % (OS_PMAN, OS_PMAN, wine)) != 0:
             return False
 
         # Set wine Path (persistently) to include Lazarus binary directory
