@@ -2,6 +2,7 @@
 # Part of `travis-lazarus` (https://github.com/nielsAD/travis-lazarus)
 # License: MIT
 
+import sys
 import os
 import subprocess
 
@@ -35,6 +36,8 @@ def install_osx_dmg(dmg):
         finally:
             # Unmount after installation
             os.system('hdiutil detach %s' % (v))
+
+    return True
 
 def install_lazarus_default():
     if OS_NAME == 'linux':
@@ -84,4 +87,4 @@ def main():
     return install_lazarus(os.environ.get('LAZ_VER'),os.environ.get('LAZ_REL'),os.environ.get('LAZ_WINE'))
 
 if __name__ == '__main__':
-    main()
+    sys.exit(int(not main()))
