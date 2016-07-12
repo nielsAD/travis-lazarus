@@ -63,7 +63,7 @@ def install_lazarus_version(ver,rel,env):
 
     if osn == 'wine':
         # Install wine and initialize wine directory
-        if os.system('%s install wine && wine wineboot' % (OS_PMAN)) != 0:
+        if os.system('sudo dpkg --add-architecture i386 && %s install wine && wine wineboot' % (OS_PMAN)) != 0:
             return False
 
         # Install all .exe files with wine
@@ -76,6 +76,10 @@ def install_lazarus_version(ver,rel,env):
         # Install all .deb files (for linux) and cross compile later
         process_file = lambda f: (not f.endswith('.deb')) or os.system('sudo dpkg -i %s' % (f)) == 0
     elif osn == 'linux':
+        # Install dependencies
+        if os.system('%s install libgtk2.0-dev' % (OS_PMAN)) != 0:
+            return False
+
         # Install all .deb files
         process_file = lambda f: (not f.endswith('.deb')) or os.system('sudo dpkg -i %s' % (f)) == 0
     elif osn == 'osx':
