@@ -47,7 +47,7 @@ def install_lazarus_default():
         pkg = 'lazarus lcl-nogui'
     elif OS_NAME == 'osx':
         # Install brew cask first
-        pkg = 'caskroom/cask/brew-cask && %s cask install fpc fpcsrc lazarus' % OS_PMAN
+        pkg = 'caskroom/cask/brew-cask && %s cask install fpc fpcsrc lazarus' % (OS_PMAN)
     else:
         # Default to lazarus
         pkg = 'lazarus'
@@ -63,7 +63,7 @@ def install_lazarus_version(ver,rel,env):
 
     if osn == 'wine':
         # Install wine and initialize wine directory
-        if os.system('sudo dpkg --add-architecture i386 && %s install wine && wine wineboot' % (OS_PMAN)) != 0:
+        if os.system('sudo dpkg --add-architecture i386 && %s update && %s install wine && wine wineboot' % (OS_PMAN, OS_PMAN)) != 0:
             return False
 
         # Install all .exe files with wine
