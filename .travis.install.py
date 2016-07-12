@@ -66,10 +66,12 @@ def install_lazarus_version(ver,rel,env):
         if os.system('sudo dpkg --add-architecture i386 && %s update && %s install xvfb wine' % (OS_PMAN, OS_PMAN)) != 0:
             return False
 
-		# Initialize virtual display and wine directory
-        if os.system('Xvfb %s & sleep 3 && wine wineboot' % (os.environ.get('DISPLAY') or '')) != 0:
+        # Initialize virtual display and wine directory
+        if os.system('Xvfb %s & sleep 3 && wineboot -i' % (os.environ.get('DISPLAY') or '')) != 0:
             return False
 
+        # Install basic Wine prerequisites, ignore failure
+        os.system('winetricks -q corefonts')
 
         # Install all .exe files with wine
         process_file = lambda f: (not f.endswith('.exe')) or os.system('wine %s /VERYSILENT /DIR="c:\\lazarus"' % (f)) == 0
@@ -99,7 +101,7 @@ def install_lazarus_version(ver,rel,env):
 
     if osn == 'wine':
         # Set wine Path (persistently) to include Lazarus binary directory
-        if os.system('wine cmd /C reg add HKEY_CURRENT_USER\\\\Environment /v PATH /t REG_SZ /d %%PATH%%\\;c:\\\\lazarus') != 0:
+        if os.system('wine cmd /C reg add HKEY_CURRENT_USER\\\\Environment /v PATH /t REG_SZ /d "%PATH%\\;c:\\\\lazarus"') != 0:
             return False
 
         # Redirect listed executables so they execute in wine
@@ -136,6 +138,7 @@ def install_lazarus_version(ver,rel,env):
             '-XParm-linux-gnueabi-',
             '-Fl/usr/arm-linux-gnueabi/lib',
             '-Fl/usr/lib/gcc/arm-linux-gnueabi/%s' % (gccv),
+            '-Fl/usr/lib/gcc-cross/arm-linux-gnueabi/%s' % (gccv),
             # '-CpARMV7A', '-CfVFPV3_D16',
             '#ENDIF'
         ])
