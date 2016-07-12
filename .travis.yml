@@ -35,18 +35,18 @@ matrix:
     - os: linux
       env: LAZ_VER=1.6    LAZ_ENV=wine WINEARCH=win64 LAZ_OPT="--os=win64 --cpu=x86_64"
     - os: linux
-      env: LAZ_VER=1.2.6  LAZ_ENV=qemu-arm LAZ_OPT="--os=linux --cpu=arm --widgetset=nogui"
+      env: LAZ_VER=1.2.6  LAZ_ENV=qemu-arm LAZ_OPT="--os=linux --cpu=arm"
     - os: linux
-      env: LAZ_VER=1.4.4  LAZ_ENV=qemu-arm LAZ_OPT="--os=linux --cpu=arm --widgetset=nogui"
+      env: LAZ_VER=1.4.4  LAZ_ENV=qemu-arm LAZ_OPT="--os=linux --cpu=arm"
     - os: linux
-      env: LAZ_VER=1.6    LAZ_ENV=qemu-arm LAZ_OPT="--os=linux --cpu=arm --widgetset=nogui"
+      env: LAZ_VER=1.6    LAZ_ENV=qemu-arm LAZ_OPT="--os=linux --cpu=arm"
 
 before_install:
-    # Start virtual display server
-  - sh -e /etc/init.d/xvfb start || true
+  # Start virtual display server
+  - Xvfb $DISPLAY &
 
 install:
-    # Install prerequisites (fpc/lazarus/wine/qemu)
+  # Install prerequisites (fpc/lazarus/wine/qemu)
   - ./.travis.install.py
 
 script:

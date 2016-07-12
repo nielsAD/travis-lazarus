@@ -62,15 +62,20 @@ def install_lazarus_version(ver,rel,env):
         return False
 
     if osn == 'wine':
-        # Install wine and initialize wine directory
-        if os.system('sudo dpkg --add-architecture i386 && %s update && %s install wine && wine wineboot' % (OS_PMAN, OS_PMAN)) != 0:
+        # Install wine and Xvfb
+        if os.system('sudo dpkg --add-architecture i386 && %s update && %s install xvfb wine' % (OS_PMAN, OS_PMAN)) != 0:
             return False
+
+		# Initialize virtual display and wine directory
+        if os.system('Xvfb %s & sleep 3 && wine wineboot' % (os.environ.get('DISPLAY') or '')) != 0:
+            return False
+
 
         # Install all .exe files with wine
         process_file = lambda f: (not f.endswith('.exe')) or os.system('wine %s /VERYSILENT /DIR="c:\\lazarus"' % (f)) == 0
     elif osn == 'qemu-arm' or osn == 'qemu-arm-static':
         # Install qemu and arm cross compiling utilities
-        if os.system('%s install qemu-user qemu-user-static binutils-arm-linux-gnueabi gcc-arm-linux-gnueabi' % (OS_PMAN)) != 0:
+        if os.system('%s install libgtk2.0-dev qemu-user qemu-user-static binutils-arm-linux-gnueabi gcc-arm-linux-gnueabi' % (OS_PMAN)) != 0:
             return False
 
         # Install all .deb files (for linux) and cross compile later
