@@ -14,32 +14,24 @@ env:
     - WINEPREFIX=~/.winelaz
     - DISPLAY=:99.0
   matrix:
-    - LAZ_PKG=true   # Use the latest version from the default package manager
-    - LAZ_VER=1.0.14 # Use specific (binary) release
-    - LAZ_VER=1.2.6
-    - LAZ_VER=1.4.4
-    - LAZ_VER=1.6
+    - LAZ_PKG=true  # Use the latest version from the default package manager
+    - LAZ_VER=1.4.4 # Use specific (binary) release
+    - LAZ_VER=1.6.2
 
 matrix:
   include:
     - os: linux
-      env: LAZ_VER=1.2.6  LAZ_ENV=wine WINEARCH=win32 LAZ_OPT="--os=win32 --cpu=i386"
-    - os: linux
       env: LAZ_VER=1.4.4  LAZ_ENV=wine WINEARCH=win32 LAZ_OPT="--os=win32 --cpu=i386"
     - os: linux
-      env: LAZ_VER=1.6    LAZ_ENV=wine WINEARCH=win32 LAZ_OPT="--os=win32 --cpu=i386"
-    - os: linux
-      env: LAZ_VER=1.2.6  LAZ_ENV=wine WINEARCH=win64 LAZ_OPT="--os=win64 --cpu=x86_64"
+      env: LAZ_VER=1.6.2  LAZ_ENV=wine WINEARCH=win32 LAZ_OPT="--os=win32 --cpu=i386"
     - os: linux
       env: LAZ_VER=1.4.4  LAZ_ENV=wine WINEARCH=win64 LAZ_OPT="--os=win64 --cpu=x86_64"
     - os: linux
-      env: LAZ_VER=1.6    LAZ_ENV=wine WINEARCH=win64 LAZ_OPT="--os=win64 --cpu=x86_64"
-    - os: linux
-      env: LAZ_VER=1.2.6  LAZ_ENV=qemu-arm LAZ_OPT="--os=linux --cpu=arm"
+      env: LAZ_VER=1.6.2  LAZ_ENV=wine WINEARCH=win64 LAZ_OPT="--os=win64 --cpu=x86_64"
     - os: linux
       env: LAZ_VER=1.4.4  LAZ_ENV=qemu-arm LAZ_OPT="--os=linux --cpu=arm"
     - os: linux
-      env: LAZ_VER=1.6    LAZ_ENV=qemu-arm LAZ_OPT="--os=linux --cpu=arm"
+      env: LAZ_VER=1.6.2  LAZ_ENV=qemu-arm LAZ_OPT="--os=linux --cpu=arm"
 
 before_install:
   # Start virtual display server
@@ -54,5 +46,6 @@ script:
   - $LAZ_ENV ./bin/my_lazarus_tests --all --format=plain # Run my_lazarus_test testsuite
 
 notifications:
-  email: false
-
+  email:
+    on_success: false
+    on_failure: change
