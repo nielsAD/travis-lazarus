@@ -81,14 +81,14 @@ def install_lazarus_version(ver,rel,env):
             return False
 
         # Install all .deb files (for linux) and cross compile later
-        process_file = lambda f: (not f.endswith('.deb')) or os.system('sudo dpkg -i %s' % (f)) == 0
+        process_file = lambda f: (not f.endswith('.deb')) or os.system('sudo dpkg --force-overwrite -i %s' % (f)) == 0
     elif osn == 'linux':
         # Install dependencies
         if os.system('%s install libgtk2.0-dev' % (OS_PMAN)) != 0:
             return False
 
         # Install all .deb files
-        process_file = lambda f: (not f.endswith('.deb')) or os.system('sudo dpkg -i %s' % (f)) == 0
+        process_file = lambda f: (not f.endswith('.deb')) or os.system('sudo dpkg --force-overwrite -i %s' % (f)) == 0
     elif osn == 'osx':
         # Install all .dmg files
         process_file = lambda f: (not f.endswith('.dmg')) or install_osx_dmg(f)
