@@ -25,7 +25,8 @@ How to use
   - Add the following lines to your `.travis.yml` file:
 
     ```yaml
-    sudo: true
+    sudo: required
+    dist: trusty
     install: ./travis-lazarus/.travis.install.py
     ```
 - **[OPTIONAL]** Modify settings to customize build versions.
@@ -33,8 +34,8 @@ How to use
 
     ```yaml
     env:
-      - LAZ_VER=1.2.6
       - LAZ_VER=1.4.4
+      - LAZ_VER=1.6.2
     ```
   - Set the `os` field to specify the target operating system(s):
 
@@ -49,18 +50,17 @@ How to use
     matrix:
       include:
         - os: linux
-          env: LAZ_VER=1.4.4 LAZ_ENV=wine WINEARCH=win32 LAZ_OPT="--os=win32 --cpu=i386"
+          env: LAZ_VER=1.6.2 LAZ_ENV=wine WINEARCH=win32 LAZ_OPT="--os=win32 --cpu=i386"
         - os: linux
-          env: LAZ_VER=1.4.4 LAZ_ENV=wine WINEARCH=win64 LAZ_OPT="--os=win64 --cpu=x86_64"
+          env: LAZ_VER=1.6.2 LAZ_ENV=wine WINEARCH=win64 LAZ_OPT="--os=win64 --cpu=x86_64"
     ```
-    Note that your run script should take into account that it should run with Wine, for example using `$LAZ_ENV lazbuild $LAZ_OPT`. This also requires a virtual display server, as explained in the next step.
-  - Add a virtual display server if you cannot run headless (_required for Wine_):
+  - Add a virtual display server if you cannot run your program headless:
 
     ```yaml
     env:
       global:
         - DISPLAY=:99.0
-    before_install: - sh -e /etc/init.d/xvfb start || true
+    before_install: - Xvfb $DISPLAY &
     ```
   - Other optional environment variables:
     - `LAZ_REL` release platform (use with `LAZ_VER`):

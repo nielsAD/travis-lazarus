@@ -47,7 +47,7 @@ def install_lazarus_default():
         pkg = 'lazarus lcl-nogui'
     elif OS_NAME == 'osx':
         # Install brew cask first
-        pkg = 'caskroom/cask/brew-cask && %s cask install fpc fpcsrc lazarus' % OS_PMAN
+        pkg = 'fpc caskroom/cask/brew-cask && %s cask install fpcsrc lazarus' % (OS_PMAN)
     else:
         # Default to lazarus
         pkg = 'lazarus'
@@ -62,22 +62,33 @@ def install_lazarus_version(ver,rel,env):
         return False
 
     if osn == 'wine':
-        # Install wine and initialize wine directory
-        if os.system('%s install wine && wine wineboot' % (OS_PMAN)) != 0:
+        # Install wine and Xvfb
+        if os.system('sudo dpkg --add-architecture i386 && %s update && %s install xvfb wine' % (OS_PMAN, OS_PMAN)) != 0:
             return False
+
+        # Initialize virtual display and wine directory
+        if os.system('Xvfb %s & sleep 3 && wineboot -i' % (os.environ.get('DISPLAY') or '')) != 0:
+            return False
+
+        # Install basic Wine prerequisites, ignore failure
+        os.system('winetricks -q corefonts')
 
         # Install all .exe files with wine
         process_file = lambda f: (not f.endswith('.exe')) or os.system('wine %s /VERYSILENT /DIR="c:\\lazarus"' % (f)) == 0
     elif osn == 'qemu-arm' or osn == 'qemu-arm-static':
         # Install qemu and arm cross compiling utilities
-        if os.system('%s install qemu-user qemu-user-static binutils-arm-linux-gnueabi gcc-arm-linux-gnueabi' % (OS_PMAN)) != 0:
+        if os.system('%s install libgtk2.0-dev qemu-user qemu-user-static binutils-arm-linux-gnueabi gcc-arm-linux-gnueabi' % (OS_PMAN)) != 0:
             return False
 
         # Install all .deb files (for linux) and cross compile later
-        process_file = lambda f: (not f.endswith('.deb')) or os.system('sudo dpkg -i %s' % (f)) == 0
+        process_file = lambda f: (not f.endswith('.deb')) or os.system('sudo dpkg --force-overwrite -i %s' % (f)) == 0
     elif osn == 'linux':
+        # Install dependencies
+        if os.system('%s install libgtk2.0-dev' % (OS_PMAN)) != 0:
+            return False
+
         # Install all .deb files
-        process_file = lambda f: (not f.endswith('.deb')) or os.system('sudo dpkg -i %s' % (f)) == 0
+        process_file = lambda f: (not f.endswith('.deb')) or os.system('sudo dpkg --force-overwrite -i %s' % (f)) == 0
     elif osn == 'osx':
         # Install all .dmg files
         process_file = lambda f: (not f.endswith('.dmg')) or install_osx_dmg(f)
@@ -90,7 +101,7 @@ def install_lazarus_version(ver,rel,env):
 
     if osn == 'wine':
         # Set wine Path (persistently) to include Lazarus binary directory
-        if os.system('wine cmd /C reg add HKEY_CURRENT_USER\\\\Environment /v PATH /t REG_SZ /d %%PATH%%\\;c:\\\\lazarus') != 0:
+        if os.system('wine cmd /C reg add HKEY_CURRENT_USER\\\\Environment /v PATH /t REG_SZ /d "%PATH%\\;c:\\\\lazarus"') != 0:
             return False
 
         # Redirect listed executables so they execute in wine
@@ -127,6 +138,7 @@ def install_lazarus_version(ver,rel,env):
             '-XParm-linux-gnueabi-',
             '-Fl/usr/arm-linux-gnueabi/lib',
             '-Fl/usr/lib/gcc/arm-linux-gnueabi/%s' % (gccv),
+            '-Fl/usr/lib/gcc-cross/arm-linux-gnueabi/%s' % (gccv),
             # '-CpARMV7A', '-CfVFPV3_D16',
             '#ENDIF'
         ])
