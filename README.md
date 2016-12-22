@@ -54,8 +54,7 @@ How to use
         - os: linux
           env: LAZ_VER=1.6.2 LAZ_ENV=wine WINEARCH=win64 LAZ_OPT="--os=win64 --cpu=x86_64"
     ```
-    Note that your run script should take into account that it should run with Wine, for example using `$LAZ_ENV lazbuild $LAZ_OPT`. This also requires a virtual display server, as explained in the next step.
-  - Add a virtual display server if you cannot run headless (_required for Wine_):
+  - Add a virtual display server if you cannot run your program headless:
 
     ```yaml
     env:
