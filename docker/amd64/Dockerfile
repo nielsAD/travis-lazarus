@@ -3,15 +3,34 @@ MAINTAINER Niels AD <docker@nielsd.nl>
 
 WORKDIR /build
 
+ENV mirror  https://downloads.sourceforge.net/project/lazarus/Lazarus%20Linux%20amd64%20DEB/Lazarus%201.4
+ENV fpc     fpc_2.6.4-150228_amd64.deb
+ENV fpc_src fpc-src_2.6.4-150228_amd64.deb
+ENV lazarus lazarus_1.4.0-0_amd64.deb
+
 RUN \
   apt-get update && \
-  apt-get -y install wget libgtk2.0-dev && \
-  wget -q http://mirrors.iwi.me/lazarus/releases/Lazarus%20Linux%20amd64%20DEB/Lazarus%201.4/fpc_2.6.4-150228_amd64.deb && \
-  dpkg -i fpc_2.6.4-150228_amd64.deb && \
-  rm fpc_2.6.4-150228_amd64.deb && \
-  wget -q http://mirrors.iwi.me/lazarus/releases/Lazarus%20Linux%20amd64%20DEB/Lazarus%201.4/fpc-src_2.6.4-150228_amd64.deb && \
-  dpkg -i fpc-src_2.6.4-150228_amd64.deb && \
-  rm fpc-src_2.6.4-150228_amd64.deb && \
-  wget -q http://mirrors.iwi.me/lazarus/releases/Lazarus%20Linux%20amd64%20DEB/Lazarus%201.4/lazarus_1.4.0-0_amd64.deb && \
-  dpkg -i lazarus_1.4.0-0_amd64.deb && \
-  rm lazarus_1.4.0-0_amd64.deb
+  apt-get -y --no-install-recommends install \
+    wget \
+    ca-certificates \
+    binutils \
+    gcc \
+    libgtk2.0-dev
+
+RUN for pkg in "${fpc}" "${fpc_src}" "${lazarus}"; do \
+    wget -q ${mirror}/${pkg} && \
+    dpkg -i ./${pkg} && \
+    rm ./${pkg}; \
+  done
+
+RUN \
+  apt-get -y -f install && \
+  apt-get purge -y wget && \
+  apt-get clean -y && \
+  apt-get autoclean -y && \
+  apt-get autoremove -y && \
+  rm -rf /var/cache/debconf/*-old && \
+  rm -rf /var/lib/apt/lists/* && \
+  rm -rf /usr/share/doc/* && \
+  rm -rf /tmp/* && \
+  rm -rf /var/tmp/*
