@@ -14,6 +14,9 @@ script:
   - docker run -v $TRAVIS_BUILD_DIR:/build nielsad/travis-lazarus:latest-amd64 bash -c "lazbuild my_lazarus_tests.lpi && ./bin/my_lazarus_tests --all --format=plain"
   - docker run -v $TRAVIS_BUILD_DIR:/build nielsad/travis-lazarus:1.4.0-amd64  bash -c "lazbuild my_lazarus_tests.lpi && ./bin/my_lazarus_tests --all --format=plain"
 
+  - docker run -v $TRAVIS_BUILD_DIR:/build nielsad/travis-lazarus:latest-i386 bash -c "lazbuild my_lazarus_tests.lpi && ./bin/my_lazarus_tests --all --format=plain"
+  - docker run -v $TRAVIS_BUILD_DIR:/build nielsad/travis-lazarus:1.4.0-i386  bash -c "lazbuild my_lazarus_tests.lpi && ./bin/my_lazarus_tests --all --format=plain"
+
 notifications:
   email:
     on_success: false
