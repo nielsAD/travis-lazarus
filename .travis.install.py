@@ -140,7 +140,8 @@ def install_lazarus_version(ver,rel,env):
             '-Fl/usr/lib/gcc/arm-linux-gnueabi/%s' % (gccv),
             '-Fl/usr/lib/gcc-cross/arm-linux-gnueabi/%s' % (gccv),
             # '-CpARMV7A', '-CfVFPV3_D16',
-            '#ENDIF'
+            '#ENDIF',
+            ''
         ])
         with open(os.path.expanduser('~/.fpc.cfg'),'w') as f:
             f.write(config)
