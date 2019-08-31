@@ -3,7 +3,7 @@ Travis CI integration for FPC / Lazarus
 
 [![Build Status](https://travis-ci.org/nielsAD/travis-lazarus.svg?branch=master)](https://travis-ci.org/nielsAD/travis-lazarus)
 
-[Travis CI](https://travis-ci.org/) currently has no official support for [FreePascal](http://freepascal.org/). This repository demonstrates how FPC and [Lazarus](http://www.lazarus-ide.org/) projects can be used in combination with Travis. There is support for building with multiple Lazarus releases on both Travis' `Linux` and `Mac OSX` platforms. Support for Windows (both `win32` and `win64`) is done using [Wine](https://www.winehq.org/).
+[Travis CI](https://travis-ci.org/) currently has no official support for [FreePascal](http://freepascal.org/). This repository demonstrates how FPC and [Lazarus](http://www.lazarus-ide.org/) projects can be used in combination with Travis. There is support for building with multiple Lazarus releases on Travis' `Linux`, `Mac OSX` and `Windows 10` platforms. Support for Windows (both `win32` and `win64`) can also be done using [Wine](https://www.winehq.org/).
 
 Files
 -----
@@ -43,6 +43,7 @@ How to use
     os:
       - linux
       - osx
+      - windows
     ```
   - Add Windows builds using Wine (_although a good indicator, success with Wine does not guarantee success with Windows, and vice versa!!_):
 
@@ -53,6 +54,16 @@ How to use
           env: LAZ_VER=1.6.2 LAZ_ENV=wine WINEARCH=win32 LAZ_OPT="--os=win32 --cpu=i386"
         - os: linux
           env: LAZ_VER=1.6.2 LAZ_ENV=wine WINEARCH=win64 LAZ_OPT="--os=win64 --cpu=x86_64"
+    ```
+  - Add Windows 10 server builds:
+
+    ```yaml
+    matrix:
+      include:
+        - os: windows
+          env: LAZ_VER=2.0.2 LAZ_REL=32 LAZ_OPT="--os=win32 --cpu=i386"
+        - os: windows
+          env: LAZ_VER=2.0.2 LAZ_REL=64 LAZ_OPT="--os=win64 --cpu=x86_64"
     ```
   - Add a virtual display server if you cannot run your program headless:
 
@@ -67,4 +78,5 @@ How to use
       - Linux: `i386` or `amd64`
       - Mac OSX: `i386` or `powerpc`
       - Wine: `32` or `64`
+      - Windows: `32` or `64`
     - `LAZ_TMP_DIR` temporary directory.

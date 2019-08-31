@@ -1,22 +1,23 @@
 # Part of `travis-lazarus` (https://github.com/nielsAD/travis-lazarus)
 # License: MIT
 
-language: generic
+
+language: shell
 sudo: required
 dist: trusty
 
 os:
   - linux
   - osx
+  - windows
 
 env:
   global:
     - WINEPREFIX=~/.winelaz
     - DISPLAY=:99.0
   matrix:
-    - LAZ_PKG=true  # Use the latest version from the default package manager
-    - LAZ_VER=1.4.4 # Use specific (binary) release
-    - LAZ_VER=1.8.2
+    - LAZ_PKG=true  # Use the latest version from the default package manager. (apt, brew or choco)
+    - LAZ_VER=1.8.2 # Use specific (binary) release from SourceForce
 
 matrix:
   include:
@@ -32,14 +33,22 @@ matrix:
       env: LAZ_VER=1.4.4  LAZ_ENV=qemu-arm LAZ_OPT="--os=linux --cpu=arm"
     - os: linux
       env: LAZ_VER=1.8.2 LAZ_ENV=qemu-arm LAZ_OPT="--os=linux --cpu=arm"
+    - os: windows
+      env: LAZ_VER=2.0.2 LAZ_REL=32 LAZ_OPT="--os=win32 --cpu=i386"
+    - os: windows
+      env: LAZ_VER=2.0.2 LAZ_REL=64 LAZ_OPT="--os=win64 --cpu=x86_64"
 
 before_install:
-  # Start virtual display server
-  - Xvfb $DISPLAY &
+- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then choco install python3 --params "/InstallDir:C:\python3"; fi
+- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then export PATH=/c/Python3:/c/Python3/Scripts:/c/lazarus:$PATH; fi
+- if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then
+    Xvfb $DISPLAY &
+  fi
 
 install:
   # Install prerequisites (fpc/lazarus/wine/qemu)
-  - ./.travis.install.py
+- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then python ./.travis.install.py; fi
+- if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then ./.travis.install.py; fi
 
 script:
   - lazbuild $LAZ_OPT my_lazarus_tests.lpi               # Build my_lazarus_test project
