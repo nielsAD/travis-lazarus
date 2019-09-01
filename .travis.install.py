@@ -62,11 +62,13 @@ def install_lazarus_version(ver,rel,env):
     src = LAZ_BIN_SRC % {'target': tgt, 'version': ver}
 
     # Create sourceforge download script
-    f = open(DOWNLOAD_SCRIPT, "w")
-    f.write('wget -w 1 -np -m -A download %s\n' % (src))
-    f.write('grep -Rh refresh sourceforge.net/ | grep -o "https://[^\\?]*" > urllist\n')
-    f.write('while read url; do wget --content-disposition "${url}" -A .deb,.dmg,.exe -P %s; done < urllist\n' % (LAZ_TMP_DIR))
-    f.close()
+    sourceforce_script = '\n'.join([
+        'wget -w 1 -np -m -A download %s' % (src),
+        'grep -Rh refresh sourceforge.net/ | grep -o "https://[^\\?]*" > urllist',
+        'while read url; do wget --content-disposition "${url}" -A .deb,.dmg,.exe -P %s; done < urllist' % (LAZ_TMP_DIR)
+    ])
+    with open(DOWNLOAD_SCRIPT,'w') as f:
+        f.write(sourceforce_script)
 
     # Show download script for debug purpose
     os.system('cat %s' % (DOWNLOAD_SCRIPT))
