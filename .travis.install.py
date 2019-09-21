@@ -71,7 +71,7 @@ def install_lazarus_version(ver,rel,env):
         return False
 
     if osn == 'wine':
-        PKG_WINE={'bionic': 'wine32 wine-stable'}[os.environ.get('TRAVIS_DIST')] or 'wine'
+        PKG_WINE={'bionic': 'wine32 wine-stable'}.get(os.environ.get('TRAVIS_DIST'), 'wine')
 
         # Install wine and Xvfb
         if os.system('sudo dpkg --add-architecture i386 && %s update && %s install xvfb %s' % (OS_PMAN, OS_PMAN, PKG_WINE)) != 0:
