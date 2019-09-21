@@ -8,7 +8,7 @@ import subprocess
 
 OS_NAME=os.environ.get('TRAVIS_OS_NAME') or 'linux'
 OS_PMAN={'linux': 'sudo apt-get', 'osx': 'brew'}[OS_NAME]
-PKG_WINE={'linux': 'wine32', 'osx': 'wine'}[OS_NAME]
+PKG_WINE={'linux': 'wine32 wine-stable', 'osx': 'wine'}[OS_NAME]
 
 LAZ_TMP_DIR=os.environ.get('LAZ_TMP_DIR') or 'lazarus_tmp'
 LAZ_REL_DEF=os.environ.get('LAZ_REL_DEF') or {'linux':'amd64', 'qemu-arm':'amd64', 'qemu-arm-static':'amd64', 'osx':'i386', 'wine':'32'}
@@ -77,7 +77,7 @@ def install_lazarus_version(ver,rel,env):
             return False
 
         # Initialize virtual display and wine directory
-        if os.system('Xvfb %s & sleep 3 && wineboot -i' % (os.environ.get('DISPLAY') or '')) != 0:
+        if os.system('Xvfb %s & sleep 3 && (wineboot -i || wineboot-stable -i)' % (os.environ.get('DISPLAY') or '')) != 0:
             return False
 
         # Install basic Wine prerequisites, ignore failure
