@@ -8,7 +8,6 @@ import subprocess
 
 OS_NAME=os.environ.get('TRAVIS_OS_NAME') or 'linux'
 OS_PMAN={'linux': 'sudo apt-get', 'osx': 'brew'}[OS_NAME]
-PKG_WINE={'linux': 'wine32 wine-stable', 'osx': 'wine'}[OS_NAME]
 
 LAZ_TMP_DIR=os.environ.get('LAZ_TMP_DIR') or 'lazarus_tmp'
 LAZ_REL_DEF=os.environ.get('LAZ_REL_DEF') or {'linux':'amd64', 'qemu-arm':'amd64', 'qemu-arm-static':'amd64', 'osx':'i386', 'wine':'32'}
@@ -72,6 +71,8 @@ def install_lazarus_version(ver,rel,env):
         return False
 
     if osn == 'wine':
+        PKG_WINE={'bionic': 'wine32 wine-stable'}[os.environ.get('TRAVIS_DIST')] or 'wine'
+
         # Install wine and Xvfb
         if os.system('sudo dpkg --add-architecture i386 && %s update && %s install xvfb %s' % (OS_PMAN, OS_PMAN, PKG_WINE)) != 0:
             return False
