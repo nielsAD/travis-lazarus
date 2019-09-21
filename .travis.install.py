@@ -87,7 +87,7 @@ def install_lazarus_version(ver,rel,env):
         process_file = lambda f: (not f.endswith('.exe')) or os.system('wine %s /VERYSILENT /DIR="c:\\lazarus"' % (f)) == 0
     elif osn == 'qemu-arm' or osn == 'qemu-arm-static':
         # Install qemu and arm cross compiling utilities
-        if os.system('%s install libgtk2.0-dev qemu-user qemu-user-static binutils-arm-linux-gnueabi gcc-arm-linux-gnueabi' % (OS_PMAN)) != 0:
+        if os.system('%s install libgtk2.0-dev qemu-user qemu-user-static binutils-arm-linux-gnueabi gcc-arm-linux-gnueabi libc-dev-armel-cross' % (OS_PMAN)) != 0:
             return False
 
         # Install all .deb files (for linux) and cross compile later
