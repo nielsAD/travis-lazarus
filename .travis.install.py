@@ -46,8 +46,8 @@ def install_lazarus_default():
         # Make sure nogui is installed for headless runs
         pkg = 'lazarus lcl-nogui'
     elif OS_NAME == 'osx':
-        # Install brew cask first
-        pkg = 'fpc caskroom/cask/brew-cask && %s cask install fpcsrc lazarus' % (OS_PMAN)
+        # cask is already present in brew
+        pkg = 'fpc && %s cask install fpcsrc lazarus' % (OS_PMAN)
     else:
         # Default to lazarus
         pkg = 'lazarus'
