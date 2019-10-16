@@ -32,6 +32,9 @@ matrix:
       env: LAZ_VER=1.4.4  LAZ_ENV=qemu-arm LAZ_OPT="--os=linux --cpu=arm"
     - os: linux
       env: LAZ_VER=1.8.2 LAZ_ENV=qemu-arm LAZ_OPT="--os=linux --cpu=arm"
+    - os: linux
+      arch: arm64
+      env: LAZ_PKG=true
 
 before_install:
   # Start virtual display server
