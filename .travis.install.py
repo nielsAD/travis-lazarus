@@ -67,7 +67,7 @@ def install_lazarus_version(ver,rel,env):
     if os.system('grep -Rh refresh sourceforge.net/ | grep -o "https://[^\\?]*" > urllist') != 0:
         return False
 
-    if os.system('while read url; do wget --content-disposition "${url}"  -A .deb,.dmg,.exe -P %s; done < urllist'  % (LAZ_TMP_DIR)) != 0:
+    if os.system('while read url; do wget --content-disposition "${url}"  -A .deb,.dmg,"lazarus-*-fpc-3.*.0-win32.exe" -P %s; done < urllist'  % (LAZ_TMP_DIR)) != 0:
         return False
 
     if osn == 'wine':
