@@ -118,12 +118,12 @@ def install_lazarus_version(ver,rel,env):
         # Redirect listed executables so they execute in wine
         for alias in ('fpc', 'lazbuild', 'lazarus'):
             os.system('echo "#!/usr/bin/env bash \nwine %(target)s \$@" | sudo tee %(name)s > /dev/null && sudo chmod +x %(name)s' % {
-                'target': subprocess.check_output("find $WINEPREFIX -iname '%s.exe' | head -1 " % (alias), shell=True).strip(),
+                'target': subprocess.check_output("find $WINEPREFIX -iname '%s.exe' | head -1 " % (alias), shell=True).strip().decode(encoding='UTF-8'),
                 'name': '/usr/bin/%s' % (alias)
             })
     elif osn == 'qemu-arm' or osn == 'qemu-arm-static':
-        fpcv = subprocess.check_output('fpc -iV', shell=True).strip()
-        gccv = subprocess.check_output('arm-linux-gnueabi-gcc -dumpversion', shell=True).strip()
+        fpcv = subprocess.check_output('fpc -iV', shell=True).strip().decode(encoding='UTF-8')
+        gccv = subprocess.check_output('arm-linux-gnueabi-gcc -dumpversion', shell=True).strip().decode(encoding='UTF-8')
         opts = ' '.join([
             'CPU_TARGET=arm',
             'OS_TARGET=linux',
