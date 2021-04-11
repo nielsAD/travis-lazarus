@@ -20,6 +20,10 @@ LAZ_BIN_TGT=os.environ.get('LAZ_BIN_TGT') or {
     'wine':            'Lazarus%%20Windows%%20%(release)s%%20bits'
 }
 
+def system(cmd):
+    print("travis-lazarus: " + cmd)
+    return os.system(cmd)
+
 def install_osx_dmg(dmg):
     try:
         # Mount .dmg file and parse (automatically determined) target volumes
@@ -29,7 +33,7 @@ def install_osx_dmg(dmg):
         return False
 
     # Install .pkg files with installer
-    install_pkg = lambda v, f: os.system('sudo installer -pkg %s/%s -target /' % (v, f)) == 0
+    install_pkg = lambda v, f: system('sudo installer -pkg %s/%s -target /' % (v, f)) == 0
 
     for v in vol:
         try:
@@ -37,7 +41,7 @@ def install_osx_dmg(dmg):
                 return False
         finally:
             # Unmount after installation
-            os.system('hdiutil detach %s' % (v))
+            system('hdiutil detach %s' % (v))
 
     return True
 
@@ -51,55 +55,53 @@ def install_lazarus_default():
     else:
         # Default to lazarus
         pkg = 'lazarus'
-    return os.system('%s install %s' % (OS_PMAN, pkg)) == 0
+    return system('%s install %s' % (OS_PMAN, pkg)) == 0
 
 def install_lazarus_version(ver,rel,env):
     # Download all files in directory for specified Lazarus version
     osn = env or OS_NAME
     tgt = LAZ_BIN_TGT[osn] % {'release': rel or LAZ_REL_DEF[osn]}
     src = LAZ_BIN_SRC % {'target': tgt, 'version': ver}
-    if os.system('echo wget -w 1 -np -m -A download %s' % (src)) != 0:
+
+    if system('wget -w 1 -np -m -A download %s' % (src)) != 0:
         return False
 
-    if os.system('wget -w 1 -np -m -A download %s' % (src)) != 0:
+    if system('grep -Rh refresh sourceforge.net/ | grep -o "https://[^\\?]*" > urllist') != 0:
         return False
 
-    if os.system('grep -Rh refresh sourceforge.net/ | grep -o "https://[^\\?]*" > urllist') != 0:
-        return False
-
-    if os.system('while read url; do wget --content-disposition "${url}"  -A .deb,.dmg,"lazarus-*-fpc-3.*.0-win32.exe" -P %s; done < urllist'  % (LAZ_TMP_DIR)) != 0:
+    if system('while read url; do wget --content-disposition "${url}"  -A .deb,.dmg,"lazarus-*-fpc-3.*.0-win32.exe" -P %s; done < urllist'  % (LAZ_TMP_DIR)) != 0:
         return False
 
     if osn == 'wine':
         PKG_WINE={'bionic': 'wine32 wine-stable', 'focal': 'wine32 wine-stable'}.get(os.environ.get('TRAVIS_DIST'), 'wine')
 
         # Install wine and Xvfb
-        if os.system('sudo dpkg --add-architecture i386 && %s update && %s install xvfb %s' % (OS_PMAN, OS_PMAN, PKG_WINE)) != 0:
+        if system('sudo dpkg --add-architecture i386 && %s update && %s install xvfb %s' % (OS_PMAN, OS_PMAN, PKG_WINE)) != 0:
             return False
 
         # Initialize virtual display and wine directory
-        if os.system('Xvfb %s & sleep 3 && (wineboot -i || wineboot-stable -i)' % (os.environ.get('DISPLAY') or '')) != 0:
+        if system('Xvfb %s & sleep 3 && (wineboot -i || wineboot-stable -i)' % (os.environ.get('DISPLAY') or '')) != 0:
             return False
 
         # Install basic Wine prerequisites, ignore failure
-        os.system('winetricks -q corefonts')
+        system('winetricks -q corefonts')
 
         # Install all .exe files with wine
-        process_file = lambda f: (not f.endswith('.exe')) or os.system('wine %s /VERYSILENT /DIR="c:\\lazarus"' % (f)) == 0
+        process_file = lambda f: (not f.endswith('.exe')) or system('wine %s /VERYSILENT /DIR="c:\\lazarus"' % (f)) == 0
     elif osn == 'qemu-arm' or osn == 'qemu-arm-static':
         # Install qemu and arm cross compiling utilities
-        if os.system('%s install libgtk2.0-dev qemu-user qemu-user-static binutils-arm-linux-gnueabi gcc-arm-linux-gnueabi libc-dev-armel-cross' % (OS_PMAN)) != 0:
+        if system('%s install libgtk2.0-dev qemu-user qemu-user-static binutils-arm-linux-gnueabi gcc-arm-linux-gnueabi libc-dev-armel-cross' % (OS_PMAN)) != 0:
             return False
 
         # Install all .deb files (for linux) and cross compile later
-        process_file = lambda f: (not f.endswith('.deb')) or os.system('sudo dpkg --force-overwrite -i %s' % (f)) == 0
+        process_file = lambda f: (not f.endswith('.deb')) or system('sudo dpkg --force-overwrite -i %s' % (f)) == 0
     elif osn == 'linux':
         # Install dependencies
-        if os.system('%s install libgtk2.0-dev' % (OS_PMAN)) != 0:
+        if system('%s install libgtk2.0-dev' % (OS_PMAN)) != 0:
             return False
 
         # Install all .deb files
-        process_file = lambda f: (not f.endswith('.deb')) or os.system('sudo dpkg --force-overwrite -i %s' % (f)) == 0
+        process_file = lambda f: (not f.endswith('.deb')) or system('sudo dpkg --force-overwrite -i %s' % (f)) == 0
     elif osn == 'osx':
         # Install all .dmg files
         process_file = lambda f: (not f.endswith('.dmg')) or install_osx_dmg(f)
@@ -112,12 +114,12 @@ def install_lazarus_version(ver,rel,env):
 
     if osn == 'wine':
         # Set wine Path (persistently) to include Lazarus binary directory
-        if os.system('wine cmd /C reg add HKEY_CURRENT_USER\\\\Environment /v PATH /t REG_SZ /d "%PATH%\\;c:\\\\lazarus"') != 0:
+        if system('wine cmd /C reg add HKEY_CURRENT_USER\\\\Environment /v PATH /t REG_SZ /d "%PATH%\\;c:\\\\lazarus"') != 0:
             return False
 
         # Redirect listed executables so they execute in wine
         for alias in ('fpc', 'lazbuild', 'lazarus'):
-            os.system('echo "#!/usr/bin/env bash \nwine %(target)s \$@" | sudo tee %(name)s > /dev/null && sudo chmod +x %(name)s' % {
+            system('echo "#!/usr/bin/env bash \nwine %(target)s \$@" | sudo tee %(name)s > /dev/null && sudo chmod +x %(name)s' % {
                 'target': subprocess.check_output("find $WINEPREFIX -iname '%s.exe' | head -1 " % (alias), shell=True).strip().decode(encoding='UTF-8'),
                 'name': '/usr/bin/%s' % (alias)
             })
@@ -134,11 +136,11 @@ def install_lazarus_version(ver,rel,env):
         ])
 
         # Compile ARM cross compiler
-        if os.system('cd /usr/share/fpcsrc/%s && sudo make clean crossall crossinstall %s' % (fpcv, opts)) != 0:
+        if system('cd /usr/share/fpcsrc/%s && sudo make clean crossall crossinstall %s' % (fpcv, opts)) != 0:
             return False
         
         # Symbolic link to update default FPC cross compiler for ARM
-        if os.system('sudo ln -sf /usr/lib/fpc/%s/ppcrossarm /usr/bin/ppcarm' % (fpcv)) != 0:
+        if system('sudo ln -sf /usr/lib/fpc/%s/ppcrossarm /usr/bin/ppcarm' % (fpcv)) != 0:
             return False
 
         # Update config file with paths to ARM libraries
@@ -163,7 +165,7 @@ def install_lazarus(ver=None,rel=None,env=None):
     return install_lazarus_version(ver,rel,env) if ver else install_lazarus_default()
 
 def main():
-    os.system('%s update' % (OS_PMAN))
+    system('%s update' % (OS_PMAN))
     return install_lazarus(os.environ.get('LAZ_VER'),os.environ.get('LAZ_REL'),os.environ.get('LAZ_ENV'))
 
 if __name__ == '__main__':
