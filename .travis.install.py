@@ -24,6 +24,15 @@ def system(cmd):
     print("travis-lazarus: " + cmd)
     return os.system(cmd)
 
+#sourceforge downloads add ? to filenames
+def cleanupfilename(fn):
+    if (fn.find("?") > 0):
+        newfn = fn.split("?")[0]
+        os.rename(fn, newfn)
+        return newfn
+    else:
+        return fn
+
 def install_osx_dmg(dmg):
     try:
         # Mount .dmg file and parse (automatically determined) target volumes
@@ -109,7 +118,7 @@ def install_lazarus_version(ver,rel,env):
         return False
 
     # Process all downloaded files
-    if not all(map(lambda f: process_file(os.path.join(LAZ_TMP_DIR, f)), sorted(os.listdir(LAZ_TMP_DIR)))):
+    if not all(map(lambda f: process_file(cleanupfilename(os.path.join(LAZ_TMP_DIR, f))), sorted(os.listdir(LAZ_TMP_DIR)))):
         return False
 
     if osn == 'wine':
